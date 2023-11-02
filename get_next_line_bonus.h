@@ -26,14 +26,14 @@
 # include <limits.h>
 
 char	*get_next_line(int fd);
-char	*extract_line(char *line, char *stash, int *eol_loc, int fd);
-char	*init_line(char *stash, int *eol_loc);
-size_t	locate_eol(char *line);
+char	*find_line(char *line, char *buff, int *new_line, int fd);
+char	*intr_l(char *buff, int *new_line);
+size_t	new_line(char *line);
 
 size_t	ft_strlen(const char *s);
 void	ft_bzero(void *s, size_t n);
 void	*ft_memcpy(void *dst, const void *src, size_t n);
-char	*ft_strjoin_gnl(char *s1, char *s2, int *eol_loc);
-void	ft_strlcpy_gnl(char *dst, const char *src, size_t dstsize);
+char	*ft_strjoin(char *s1, char *s2, int *new_line);
+void	ft_strlcpy(char *dst, const char *src, size_t dstsize);
 
 #endif

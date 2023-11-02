@@ -42,7 +42,7 @@ void	*ft_memcpy(void *dst, const void *src, size_t n)
 	return (dst);
 }
 
-char	*ft_strjoin_gnl(char *s1, char *s2, int *eol_loc)
+char	*ft_strjoin(char *s1, char *s2, int *new_line)
 {
 	char	*result;
 	size_t	len1;
@@ -62,11 +62,11 @@ char	*ft_strjoin_gnl(char *s1, char *s2, int *eol_loc)
 	free(s1);
 	ft_memcpy(result + len1, s2, len2 + 1);
 	if (len1 + len2 > 0 && *(result + len1 + len2 - 1) == '\n')
-		*eol_loc = 0;
+		*new_line = 0;
 	return (result);
 }
 
-void	ft_strlcpy_gnl(char *dst, const char *src, size_t dstsize)
+void	ft_strlcpy(char *dst, const char *src, size_t dstsize)
 {
 	size_t	i;
 

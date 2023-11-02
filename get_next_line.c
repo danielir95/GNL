@@ -5,36 +5,33 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: daibanez <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/18 13:36:50 by daibanez          #+#    #+#             */
-/*   Updated: 2023/10/19 12:17:46 by daibanez         ###   ########.fr       */
+/*   Created: 2023/10/25 12:47:50 by daibanez          #+#    #+#             */
+/*   Updated: 2023/10/25 12:47:58 by daibanez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <fcntl.h>
-#include <stdio.h>
-#include <unistd.h>
 
-char	*init_line(char *stash, int *eol_loc)
+char	*intr_l(char *buff, int *new_line)
 {
 	size_t	len;
 	char	*line;
 
 	len = 0;
-	while (stash[len] && stash[len] != '\n')
+	while (buff[len] && buff[len] != '\n')
 		len++;
 	len++;
 	line = malloc(sizeof(char) * (len + 1));
 	if (!line)
 		return (NULL);
-	ft_memcpy(line, stash, len);
+	ft_memcpy(line, buff, len);
 	line[len] = '\0';
 	if (len > 0 && line[len - 1] == '\n')
-		*eol_loc = len - 1;
+		*new_line = len - 1;
 	return (line);
 }
 
-size_t	locate_eol(char *line)
+size_t	loc_new_line(char *line)
 {
 	size_t	i;
 
@@ -50,29 +47,29 @@ size_t	locate_eol(char *line)
 	return (i);
 }
 
-char	*extract_line(char *line, char *stash, int *eol_loc, int fd)
+char	*find_line(char *line, char *buff, int *new_line, int fd)
 {
 	char	buffer[BUFFER_SIZE + 1];
-	ssize_t	read_check;
+	ssize_t	read_ok;
 	size_t	line_size;
 
-	while (*eol_loc == -1)
+	while (*new_line == -1)
 	{
 		ft_bzero(buffer, (BUFFER_SIZE + 1));
-		read_check = read(fd, buffer, BUFFER_SIZE);
-		if (read_check == -1)
+		read_ok = read(fd, buffer, BUFFER_SIZE);
+		if (read_ok == -1)
 		{
 			free(line);
-			ft_bzero(stash, (BUFFER_SIZE + 1));
+			ft_bzero(buff, (BUFFER_SIZE + 1));
 			return (NULL);
 		}
-		line_size = locate_eol(buffer);
-		ft_strlcpy_gnl(stash, &buffer[line_size], (BUFFER_SIZE + 1));
+		line_size = loc_new_line(buffer);
+		ft_strlcpy(buff, &buffer[line_size], (BUFFER_SIZE + 1));
 		buffer[line_size] = '\0';
-		line = ft_strjoin_gnl(line, buffer, eol_loc);
-		if (read_check == 0)
+		line = ft_strjoin(line, buffer, new_line);
+		if (read_ok == 0)
 		{
-			ft_bzero(stash, BUFFER_SIZE + 1);
+			ft_bzero(buff, BUFFER_SIZE + 1);
 			break ;
 		}
 	}
@@ -81,18 +78,18 @@ char	*extract_line(char *line, char *stash, int *eol_loc, int fd)
 
 char	*get_next_line(int fd)
 {
-	static char	stash[BUFFER_SIZE + 1];
+	static char	buff[BUFFER_SIZE + 1];
 	char		*line;
-	int			eol_loc;
+	int			new_line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	eol_loc = -1;
-	line = init_line(stash, &eol_loc);
+	new_line = -1;
+	line = intr_l(buff, &new_line);
 	if (!line)
 		return (NULL);
-	ft_strlcpy_gnl(stash, &stash[eol_loc + 1], BUFFER_SIZE + 1);
-	line = extract_line(line, stash, &eol_loc, fd);
+	ft_strlcpy(buff, &buff[new_line + 1], BUFFER_SIZE + 1);
+	line = find_line(line, buff, &new_line, fd);
 	if (!line || line[0] == '\0')
 	{
 		free(line);
